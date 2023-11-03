@@ -17,7 +17,8 @@ from scipy import interpolate
 # In[2]:
 
 
-Data_dir="/mnt/adata9/processing/"
+# Data_dir="/mnt/adata9/processing/"
+Data_dir = "/home/acumpeli/adata_laptop/mnt/adata9/processing/"
 
 
 
@@ -37,7 +38,7 @@ downsample_res=sample_rate_res/sample_rate_res_old
 animal_name='JC283'
 date='20220910'
 
-mData_dir="/mnt/adata9/merged/m"+animal_name+'-'+date+'/'
+mData_dir="/home/acumpeli/adata_laptop/mnt/adata9/merged/m"+animal_name+'-'+date+'/'
 if not os.path.isdir(mData_dir):
         os.makedirs(mData_dir)
 
@@ -87,30 +88,26 @@ for tet_i in range(num_tetrodes):
 
 
         for cell_i in range(len(good_ind)):
+            
             itemindex = np.where(neurontype[:,0] == good_ind[cell_i])
-            neurontype_i=neurontype[itemindex,1]
-            #######################################################################
-            print(neurontype_i[0][0][0]=='p')
-            if neurontype_i[0][0][0]=='b': # if cell type is interneuron/basket
+            neurontype_i=neurontype[itemindex,1][0][0]
+            
+            ############################################
+            # Check brain region
+            ############################################
+            brain_regions = ['1', 'p' or 'r' or 'o' or 'c']
+            cell_types = ['b', 'p']
+            if neurontype_i[0] in cell_types and neurontype_i[1] in brain_regions:
+                des.append(neurontype_i)
                 if tet_i<last_pfc_left:
-                    des.append('bp')
                     des_full.append('pfc_left')
                 elif tet_i<last_pfc_right:
-                    des.append('bp')
                     des_full.append('pfc_right')
                 else:
-                    des.append('b1')
                     des_full.append('hpc_right')
-            elif neurontype_i[0][0][1]=='p': # if cell type is pyramidal
-                if tet_i<last_pfc_left:
-                    des.append('pp')
-                    des_full.append('pfc_left')
-                elif tet_i<last_pfc_right:
-                    des.append('pp')
-                    des_full.append('pfc_right')
-                else:
-                    des.append('p1')
-                    des_full.append('hpc_right')
+            else:
+                print('check label for cluster', cell_i)
+                break
 
 
             res_t=spike_times[spike_clusters==good_ind[cell_i]]
