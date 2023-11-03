@@ -20,20 +20,21 @@ from scipy import interpolate
 # In[2]:
 
 
-# basedir="/mnt/adata9/processing/"
-basedir = "/home/acumpeli/adata_laptop/mnt/adata9/processing/"
+basedir="/mnt/adata9/processing/"
+#basedir = "/home/acumpeli/adata_laptop/mnt/adata9/processing/"
 
 animal_name='JC283'
-date='20220910'
+date='20220920'
 
-# mbasedir="/mnt/adata9/merged/m"+animal_name+'-'+date+'/'
-mbasedir="/home/acumpeli/adata_laptop/mnt/adata9/merged/m"+animal_name+'-'+date+'/'
+mbasedir="/mnt/adata9/merged/m"+animal_name+'-'+date+'/'
+#mbasedir="/home/acumpeli/adata_laptop/mnt/adata9/merged/m"+animal_name+'-'+date+'/'
 
-num_tetrodes=25
-last_pfc_left=8
+num_tetrodes=30
+last_pfc_left=7
 last_pfc_right=15
 
-session_idx=[[1],[2,3,4],[5],[6],[7]]
+# session_idx=[[1],[2,3,4],[5],[6],[7]] # 20220910
+session_idx = [[1],[2,3,4],[5],[6,7,8],[9]] # 20220920
 
 # Possible brain regions and cell types
 brain_regions = ['1', 'p', 'r', 'o', 'c']
@@ -76,6 +77,7 @@ clu=np.zeros([0])
 des=[]
 
 des_full=[]
+
 
 
 for tet_i in range(num_tetrodes):
