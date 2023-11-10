@@ -21,20 +21,22 @@ from scipy import interpolate
 
 
 basedir="/mnt/adata9/processing/"
-#basedir = "/home/acumpeli/adata_laptop/mnt/adata9/processing/"
+# basedir = "/home/acumpeli/adata_laptop/mnt/adata9/processing/"
 
 animal_name='JC283'
 date='20220920'
 
 mbasedir="/mnt/adata9/merged/m"+animal_name+'-'+date+'/'
-#mbasedir="/home/acumpeli/adata_laptop/mnt/adata9/merged/m"+animal_name+'-'+date+'/'
+# mbasedir="/home/acumpeli/adata_laptop/mnt/adata9/merged/m"+animal_name+'-'+date+'/'
 
-num_tetrodes=30
-last_pfc_left=7
+num_tetrodes=30 #20220909,10,20
+#num_tetrodes=25
+last_pfc_left=8
 last_pfc_right=15
 
-# session_idx=[[1],[2,3,4],[5],[6],[7]] # 20220910
-session_idx = [[1],[2,3,4],[5],[6,7,8],[9]] # 20220920
+#session_idx=[[1,2],[3,4],[5,6],[7,8],[9]] #909
+#session_idx=[[1],[2,3,4],[5],[6],[7]] #910
+session_idx=[[1],[2,3,4],[5],[6,7,8],[9]] #920
 
 # Possible brain regions and cell types
 brain_regions = ['1', 'p', 'r', 'o', 'c']
@@ -43,7 +45,7 @@ cell_types = ['b', 'p']
 
 # These variables do not change:
 
-# In[10]:
+# In[3]:
 
 
 session_names=['presleep','training1','intersleep','training2','postsleep']
@@ -55,7 +57,7 @@ sample_rate_res=20000
 
 downsampled_res=sample_rate_res/sample_rate_res_old
 
-cell_ind=2
+starting_cell_ind=2
 
 
 # ## Des file generation
@@ -78,8 +80,6 @@ des=[]
 
 des_full=[]
 
-
-
 for tet_i in range(num_tetrodes):
     print("Processing tet"+str(tet_i))
     folder=basedir+animal_name+'/'+date+'/sorted/tet'+str(tet_i)+'/phy_export/'
@@ -93,19 +93,33 @@ for tet_i in range(num_tetrodes):
 
         # Load information about clusters (whether good, noise, or mua)
         good_noise=pd.read_csv(folder+'cluster_group.tsv',sep='\t').to_numpy()
-
+	
         good_ind=np.zeros([0])
         mua_ind=np.zeros([0])
 
+#        # Iterate over clusters and keep good and mua clusters
+#        for i in range(good_noise.shape[0]):
+#            if good_noise[i,1]=='good' or good_noise[i,1]=='mua':
+#                neurontype=pd.read_csv(folder+'cluster_neurontype.tsv',sep='\t').to_numpy()
+#                good_ind=np.append(good_ind,good_noise[i,0])
+#                if good_noise[i,1]=='mua':
+#                    mua_ind=np.append(mua_ind,1)
+#                else:
+#                    mua_ind=np.append(mua_ind,0)
+#        print(good_ind, mua_ind) ####################
+                    
+        ### Shaurya's edit
+        ### I THINK IT SHOULD BE THIS              
         # Iterate over clusters and keep good and mua clusters
+
         for i in range(good_noise.shape[0]):
-            if good_noise[i,1]=='good' or good_noise[i,1]=='mua':
+            if good_noise[i,1]=='good':
                 neurontype=pd.read_csv(folder+'cluster_neurontype.tsv',sep='\t').to_numpy()
                 good_ind=np.append(good_ind,good_noise[i,0])
-                if good_noise[i,1]=='mua':
-                    mua_ind=np.append(mua_ind,1)
-                else:
-                    mua_ind=np.append(mua_ind,0)
+#            elif good_noise[i,1]=='mua':
+#                mua_ind=np.append(mua_ind,1)
+#            else:
+#                mua_ind=np.append(mua_ind,0)
 
         # For good clusters, export neuron type label to des file and brain area to des_full
         for cell_i in range(len(good_ind)):
@@ -135,15 +149,17 @@ for tet_i in range(num_tetrodes):
                 break
 
             res_t=spike_times[spike_clusters==good_ind[cell_i]]
-            clu_t=cell_ind*np.ones(len(res_t))
-
-            if mua_ind[cell_i]==1:
-                clu_t=np.ones(len(clu_t))
+            clu_t=starting_cell_ind*np.ones(len(res_t))
+            
+            print("Current cell_i:", cell_i)
+            
+#            if mua_ind[cell_i]==1:
+#                clu_t=np.ones(len(clu_t))
 
             res=np.append(res,res_t)
             clu=np.append(clu,clu_t)
 
-            cell_ind=cell_ind+1
+            starting_cell_ind=starting_cell_ind+1
 
     else:
         print('Tetrode folder missing')
@@ -151,7 +167,7 @@ for tet_i in range(num_tetrodes):
 
 # ## Resampling and interpolating of the whl file
 
-# In[6]:
+# In[ ]:
 
 
 # Load the timestamps for each recording
@@ -207,7 +223,7 @@ whl_new[index_bad_new>0,:]=1023
 # ## Whl, res and clu file splitting
 # Splitting according to session type
 
-# In[14]:
+# In[ ]:
 
 
 sort_arg=np.argsort(res)
@@ -232,7 +248,7 @@ for i in range(len(session_idx)):
     res_temp=res_down[np.logical_and(res_down<session_timestamps_down[end_cut],res_down>session_timestamps_down[start_cut])]
 
     res_temp=res_temp-session_timestamps_down[start_cut]
-    clu_temp = np.insert(clu_temp, 0, cell_ind, axis=0)
+    clu_temp = np.insert(clu_temp, 0, starting_cell_ind, axis=0)
     
     np.savetxt(mbasedir+animal_name+'-'+date+'_'+session_names[i]+'.res', res_temp.astype(int), fmt='%i')
     np.savetxt(mbasedir+animal_name+'-'+date+'_'+session_names[i]+'.clu', clu_temp.astype(int), fmt='%i')
