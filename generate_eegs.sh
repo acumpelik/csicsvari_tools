@@ -13,9 +13,10 @@ cp TEMPLATE.par $basename.par # rename channel template to dat name format
 echo ${num_dats#"0"} >> $basename.par # add number of dat files, omit leading zero
 cat BASELIST >> $basename.par # add list of files
 echo "" >> $basename.par # add empty line
-
+:
 check_len_24_20_div16_resample2_JONb $nchan
-echo "Downsampling to 20 kHz."
+echo ""
+echo "Downsampling to 20 kHz completed."
 
 # Edit num dats
 for ii in {01..04}; do
