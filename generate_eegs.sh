@@ -5,22 +5,39 @@
 # Then it will generate .par files for each dat file, and finally it will run sfilt3b.
 # Run as data user.
 
-basename=$1
-nchan=128
-num_dats=$2 # with leading zero
+# To run: first edit the path
+# ./generate_eegs.sh $animal $day
 
+path="/mnt/adata11/eeg"
+animal=$1
+day=$2
+basename=$animal-$day
+nchan=128
+
+# Change to processing directory and count the number of dat files
+cd $path/$animal/$day
+num_dats=$(find *.dat | wc -w)
+echo "The number of dats in $day is $num_dats"
+
+# Make par file in Jozsef's format
 cp TEMPLATE.par $basename.par # rename channel template to dat name format
-echo ${num_dats#"0"} >> $basename.par # add number of dat files, omit leading zero
-cat BASELIST >> $basename.par # add list of files
-echo "" >> $basename.par # add empty line
-:
+echo $num_dats >> $basename.par # append number of dat files
+cat BASELIST >> $basename.par # append list of dat files
+echo "" >> $basename.par # append empty line
+
+# there was a colon here that I removed
 check_len_24_20_div16_resample2_JONb $nchan
 echo ""
 echo "Downsampling to 20 kHz completed."
 
-# Edit num dats
-for ii in {01..04}; do
-	symlink="${basename}_$ii.par"
+# Generate symbolic links to the new par for each individual dat files
+for i in $(seq 1 $num_dats); do
+	if [ $i -lt 10 ]; then
+		symlink="${basename}_0$i.par"
+	else
+		symlink="${basename}_$i.par"
+	fi
+
 	ln -s "$basename.par" "$symlink"
 
 	# print if success or failure
@@ -31,8 +48,13 @@ for ii in {01..04}; do
 	fi
 done
 
-for ii in {01..04}; do
-	dat_basename="${basename}_${ii}"
+# Run sfilt3b to generate eeg files
+for i in $(seq 1 $num_dats); do
+	if [ $i -lt 10 ]; then
+		dat_basename="${basename}_0$i"
+	else	
+		dat_basename="${basename}_$i"
+	fi
 	sfilt3b "$dat_basename" eeg
 	if [ $? -eq 0 ]; then
 		echo "Eeg file for $dat_basename created successfully."
