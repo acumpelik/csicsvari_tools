@@ -5,9 +5,9 @@
 # Then it will generate .par files for each dat file, and finally it will run sfilt3b.
 # Run as data user.
 
-basename="JC274-20220304"
+basename=$1
 nchan=128
-num_dats=04 # with leading zero
+num_dats=$2 # with leading zero
 
 cp TEMPLATE.par $basename.par # rename channel template to dat name format
 echo ${num_dats#"0"} >> $basename.par # add number of dat files, omit leading zero
