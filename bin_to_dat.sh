@@ -8,6 +8,7 @@ day=$(pwd | rev | cut -c 1-8 | rev)
 
 # Count bin files
 numbin=$(find *.bin | wc -w)
+echo "The number of bin files is $numbin."
 
 basename=$animal-$day
 
