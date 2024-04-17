@@ -1,0 +1,56 @@
+#!/bin/bash
+ls *.dat >jj
+
+if [ $# -ne 1 ]
+then 
+    echo Usage: number of channels the recording
+    echo Will make sure the length of the file will be divisible by 16, once it has been down sampled from 24k to 20k
+    echo The programme will then downsample
+    echo The dat files will be over written, but you still have the .bin..... 
+    echo This programme will operate on every dat file the directory and will tell you what its doing
+    echo It will now make a file called resample notes "(new feature)"
+    exit
+fi
+
+if [ -e resample_notes ]
+then 
+    echo You have run this programme before!!!!!!!!!
+    exit
+fi
+
+dt=`date -u +%d"/"%m"/"%Y`
+echo resampling performed on $dt > resample_notes
+
+chno=$1
+for i in `cat jj`
+do
+    echo cutting max voltage - prevent saturation artifact
+    rescale-14-16_bit $i $i"1" $chno 15 15 5.0 4.95
+    echo resampling $i
+    echo cutting max voltage - prevent saturation artifact >> resample_notes
+    echo resampling $i >> resample_notes
+    sfirresample $i"1" /d1/josef/work/sps/24kmul5.txt junk $chno  5 6 #down sample bit can use this on one file only if you want
+    
+    rm $i"1"
+
+    len=`wc -c junk | awk '{print $1/2/'$chno'}'`
+    mod=`echo $len | awk '{print $1%512}'`
+    cut_len=`echo $mod | awk '{print $1*2*'$chno'}'`
+    if [ $cut_len -gt 0 ]
+    then	
+	echo cutting the length: $cut_len
+	spcutend junk $i $cut_len 
+	echo new length"="`wc -c $i | awk '{print $1/2/'$chno'}'`
+	echo when divided by 512:`wc -c $i | awk '{print $1/2/'$chno'/512}'` 
+
+	echo cutting the length: $cut_len  >> resample_notes
+	echo new length"="`wc -c $i | awk '{print $1/2/'$chno'}'`  >> resample_notes 
+	echo when divided by 512:`wc -c $i | awk '{print $1/2/'$chno'/512}'` >> resample_notes
+
+	rm junk
+    else
+	echo no cut required 
+	echo no cut required  >> resample_notes
+	mv junk $i
+    fi
+done
