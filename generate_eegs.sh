@@ -8,16 +8,21 @@
 # To run: first edit the path
 # ./generate_eegs.sh $animal $day
 
+# To run for multiple sessions, create a basenames file with animal and day on each line. Then run:
+# cat basenames | xargs -n 2 ./generate_eegs.sh
+
 path="/mnt/adata11/eeg"
 animal=$1
 day=$2
 basename=$animal-$day
 nchan=128
 
+echo "Now running eeg conversion on $basename."
+
 # Change to processing directory and count the number of dat files
 cd $path/$animal/$day
 num_dats=$(find *.dat | wc -w)
-echo "The number of dats in $day is $num_dats"
+echo "The number of dats is $num_dats"
 
 # Make par file in Jozsef's format
 cp TEMPLATE.par $basename.par # rename channel template to dat name format
@@ -25,9 +30,7 @@ echo $num_dats >> $basename.par # append number of dat files
 cat BASELIST >> $basename.par # append list of dat files
 echo "" >> $basename.par # append empty line
 
-# there was a colon here that I removed
 check_len_24_20_div16_resample2_JONb $nchan
-echo ""
 echo "Downsampling to 20 kHz completed."
 
 # Generate symbolic links to the new par for each individual dat files
