@@ -17,7 +17,7 @@ import json
 import argparse
 
 # Change this based on eegh location
-basedir = "/mnt/adata11/"
+basedir = "/mnt/adata9/"
 
 # Import basename
 parser = argparse.ArgumentParser()
@@ -27,9 +27,11 @@ args=parser.parse_args()
 
 animal_name=args.animal_name
 date=args.date
+basename = animal_name+'-'+date
 
 # These parameters may change
-mbasedir="/adata_pool/merged/"+animal_name+'-'+date+'/'
+mbasedir="/adata_pool/merged/"+basename+'/'
+print("Now running eegh merging on",basename)
 
 sample_rate_res_old=24000
 sample_rate_whl=39.0625
@@ -45,7 +47,7 @@ with open('session_metadata.csv', mode='r', encoding='utf-8') as file:
         session_id = line.pop('session_id')
         session_metadata[session_id] = line
         
-basename = animal_name+'-'+date
+
 
 # Read metadata
 num_tetrodes = int(session_metadata[basename]['num_tetr'])
@@ -72,6 +74,10 @@ directory_path_eegh = basedir+"eeg/"+animal_name+'/'+date+'/'
 
 # find all eegh files in a session
 eegh_files = sorted(find_files_with_eegh(directory_path_eegh)) # sort the filenames numerically
+print('Found eegh files:')
+for file in eegh_files:
+    print(file)
+
 # initialize a merged eegh file and add the first file to it
 eegh_merged=np.fromfile(eegh_files[0], dtype=np.int16)
 # reshape the first file (1D to 2D array) so that each row corresponds to one tetrode
@@ -106,15 +112,4 @@ for session_idx_i in range(len(session_idx)):
     eegh_temp=eegh_merged[start_eegh:end_eegh,:]
 
     eegh_temp.tofile(mbasedir+animal_name+'-'+date+'_'+session_names[session_idx_i]+'.eegh')
-
-
-
-
-
-
-
-
-
-
-
-
+    

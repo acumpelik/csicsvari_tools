@@ -17,7 +17,7 @@ JC267-20211126;28;8;14;['training1','intersleep','training2'];[[1,2,3,4],[5,6],[
 JC267-20211127;28;8;14;['training1','intersleep','training2'];[[1,2,3,4],[5,6],[7,8,9,10]];4,8;C,H
 JC274-20220304;25;8;14;['training1','intersleep','training2'];[[1,2],[3],[4]];7,3;C,H
 JC274-20220305;25;8;14;['training1','intersleep','training2'];[[1],[2],[3]];7,3;C,H
-JC274-20220306;25;8;14;['training1','intersleep','training2'];[[1,2],[3],[4,5,6,7,8]];7,3;C,H
+JC274-20220306;25;8;14;['training1','intersleep','training2'];[[1,2],[3],[4,5,6,7]];7,3;C,H
 JC274-20220307;25;8;14;['training1','intersleep','training2'];[[1,2,3],[4],[5,6,7,8,9]];7,3;C,H
 JC274-20220309;25;8;14;['training1','intersleep','training2'];[[1,2,3,4],[5],[6,7,8,9]];7,3;C,H
 JC274-20220310;25;8;14;['training1','intersleep','training2'];[[1,2,3,4],[5],[6,7,8,9]];7,3;C,H
