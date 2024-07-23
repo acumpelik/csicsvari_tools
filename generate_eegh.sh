@@ -10,7 +10,7 @@
 # To run for multiple sessions, create a basenames file with animal and day on each line. Then run:
 # cat basenames | xargs -n 2 ./generate_eegh.sh
 
-path="/mnt/adata11/eeg"
+path="/adata_clust/eeg"
 animal=$1
 day=$2
 basename=$animal-$day
