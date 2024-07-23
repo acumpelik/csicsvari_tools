@@ -1,7 +1,7 @@
 #!/bin/bash
 # Andrea Cumpelik 2024-05-24
 # This script is to batch run fextrcomprbb3 (eegh generation for downsampled data) for all dat files in a directory.
-# It was created after generate_eegs.sh, and assumes a par file in Jozsef's format and downsampled dats are already generated.
+# It was created after generate_eegs.sh, and now also downsamples dats from 24kHz to 20kHz and generates .par files for each dat file. After that, it runs fextrcomprbb3.
 # Run as data user.
 
 # To run: first edit the path
@@ -22,6 +22,33 @@ echo "Now running eegh conversion on $basename."
 cd $path/$animal/$day
 num_dats=$(find *.dat | wc -w)
 echo "The number of dats is $num_dats"
+
+# Make par file in Jozsef's format
+cp TEMPLATE.par $basename.par # rename channel template to dat name format
+echo $num_dats >> $basename.par # append number of dat files
+cat BASELIST >> $basename.par # append list of dat files
+echo "" >> $basename.par # append empty line
+ 
+check_len_24_20_div16_resample2_JONb $nchan
+echo "Downsampling to 20 kHz completed."
+
+# Generate symbolic links to the new par for each individual dat files
+for i in $(seq 1 $num_dats); do
+        if [ $i -lt 10 ]; then
+                symlink="${basename}_0$i.par"
+        else
+                symlink="${basename}_$i.par"
+        fi
+
+        ln -s "$basename.par" "$symlink"
+
+        # print if success or failure
+        if [ $? -eq 0 ]; then
+                echo "Symbolic link $symlink created successfully."
+        else
+                echo "Failed to create symbolic link for $symlink."
+        fi
+done
 
 # Run fextrcomprbb3 to generate eegh files
 for i in $(seq 1 $num_dats); do
