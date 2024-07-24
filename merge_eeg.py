@@ -17,7 +17,7 @@ import json
 import argparse
 
 # Change this based on eeg location
-basedir = "/mnt/adata11/"
+basedir = "/mnt/adata9/"
 
 # Import basename
 parser = argparse.ArgumentParser()
