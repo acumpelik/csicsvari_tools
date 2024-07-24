@@ -7,7 +7,7 @@ This script merges all eeg files for a session and splits them back according to
 session, and the Python script is better for multiple sessions.
 
 To run:
-cat basenames_subset | xargs -n 2 ./merge_eegh.py
+cat basenames_subset | xargs -n 2 ./merge_eeg.py
 """
 
 import numpy as np
