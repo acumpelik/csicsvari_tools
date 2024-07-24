@@ -74,20 +74,23 @@ directory_path_eegh = basedir+"eeg/"+animal_name+'/'+date+'/'
 
 # find all eegh files in a session
 eegh_files = sorted(find_files_with_eegh(directory_path_eegh)) # sort the filenames numerically
-print('Found eegh files:')
-for file in eegh_files:
-    print(file)
 
 # initialize a merged eegh file and add the first file to it
 eegh_merged=np.fromfile(eegh_files[0], dtype=np.int16)
+print('Reshaping',eegh_files[0],'from length',eegh_merged.shape)
 # reshape the first file (1D to 2D array) so that each row corresponds to one tetrode
 eegh_merged= eegh_merged.reshape(int(len(eegh_merged)/num_tetrodes),num_tetrodes)
+print('New eegh_merged shape:',eegh_merged.shape)
 
 # iterate over the other files and add them to the large merged file
 for eegh_file_i in range(1,len(eegh_files)):
     eegh_t=np.fromfile(eegh_files[eegh_file_i], dtype=np.int16)
+    print('Reshaping',eegh_files[eegh_file_i], 'from length',eegh_t.shape)
     eegh_t= eegh_t.reshape(int(len(eegh_t)/num_tetrodes),num_tetrodes)
+    print('New eegh_merged shape:',eegh_t.shape)
     eegh_merged=np.append(eegh_merged,eegh_t,axis=0)
+    
+print('Final eegh_merged shape:',eegh_merged.shape)
 
 # calculate the total length (num timestamps) of the merged eegh file
 length_eegh_merged=eegh_merged.shape[0]
@@ -96,6 +99,7 @@ length_eegh_merged=eegh_merged.shape[0]
 session_timestamps=np.loadtxt(basedir+"processing/"+animal_name+'/'+date+'/'+'session_shifts.txt')
 session_timestamps=np.append([0],session_timestamps) # start the first timestamp at 0
 session_timestamps_down=session_timestamps*downsampled_res
+print('Resampled session timestamps:',session_timestamps)
 
 
 for session_idx_i in range(len(session_idx)):
