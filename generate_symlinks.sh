@@ -5,7 +5,7 @@
 # Takes in the animal, day, path, and extension with no period
 
 path='/adata_pool/merged/'
-ext='desel'
+ext='par'
 animal=$1
 day=$2
 basename=$animal-$day

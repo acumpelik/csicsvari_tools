@@ -11,23 +11,22 @@ animal=$1
 day=$2
 ext='eeg'
 basename=$animal-$day
-script_name=$fdetswdiff_andrea
+script_name='fdetswdiff_andrea'
 
 cd $path$basename || { echo "Failed to change directory to $path"; exit 1; }
+echo "Now running ${script_nam} in ${pwd}"
 
-files_full=$(find $path$basename -type f -name $basename_$ext)
+files_full=$(find "$path$basename" -type f -name "$basename_*$ext")
+
 for file in $files_full; do
         filename=$(basename "$file")
-        middle=$(echo "$filename" | sed -E "s|${basename}_(.*)\.$ext|\1|")
-        ln -s "${basename}.${ext}" "${basename}_${middle}.${ext}"
+	if [[ ! -f $filename ]]; then
+  		echo "Base file $basefile does not exist."
+		exit 1
+	fi
+        basefilename=$(basename "$file")
+        middle=$(echo "$basefilename" | sed -E "s|${basename}_(.*)\.$ext|\1|")
+	filename="${basename}_${middle}"
+	echo "Running ${script_name} on ${filename}"
+	bash $script_name $filename
 done      
-
-
-basefile=$basename.$ext
-
-if [[ ! -f $basefile ]]; then
-  echo "Base file $basefile does not exist."
-  exit 1
-fi
-
-echo "Running ${script_name} on ${basefile}"
